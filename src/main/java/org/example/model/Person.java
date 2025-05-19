@@ -1,5 +1,5 @@
 package org.example.model;
-//person
+
 public abstract class Person {
     protected String id;
     protected String name;

@@ -1,24 +1,17 @@
 package org.example.util;
 
 import org.example.model.Driver;
-import javax.servlet.ServletContext;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class DriverFileUtil {
-    private static String FILE_PATH = null;
-
-    public static void setServletContext(ServletContext context) {
-        FILE_PATH = context.getRealPath("/WEB-INF/data/drivers.txt");
-    }
+    private static final String FILE_PATH = "E:\\OOP project\\DriverManagement\\Taxi-Booking-Platform\\data\\drivers.txt";
 
     public static void initializeDefaultDrivers() {
         File file = new File(FILE_PATH);
         if (!file.exists() || file.length() == 0) {
             List<Driver> defaultDrivers = new ArrayList<>();
-            defaultDrivers.add(new Driver("D001", "John Doe", "LIC123", "1234567890", "john@example.com", 4.5));
-            defaultDrivers.add(new Driver("D002", "Jane Smith", "LIC456", "0987654321", "jane@example.com", 4.8));
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
                 for (Driver driver : defaultDrivers) {
                     writer.write(driver.toString());

@@ -237,7 +237,7 @@
         </table>
     </div>
 
-    <a href="index.jsp" class="back-link">Back to Dashboard</a>
+    <a href="admin_dashboard.jsp" class="back-link">Back to Dashboard</a>
 </div>
 </body>
 </html>
