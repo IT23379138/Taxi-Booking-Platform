@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd"
+         version="3.1">
+
+  <display-name>Taxi and Cab Service Booking Platform</display-name>
+  <listener>
+    <listener-class>org.example.util.AppContextListener</listener-class>
+  </listener>
+
+  <!-- Login Servlet -->
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>org.example.servlet.LoginServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/LoginServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Logout Servlet -->
+  <servlet>
+    <servlet-name>LogoutServlet</servlet-name>
+    <servlet-class>org.example.servlet.LogoutServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LogoutServlet</servlet-name>
+    <url-pattern>/LogoutServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Add Driver Servlet -->
+  <servlet>
+    <servlet-name>AddDriverServlet</servlet-name>
+    <servlet-class>org.example.servlet.AddDriverServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>AddDriverServlet</servlet-name>
+    <url-pattern>/AddDriverServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- View Drivers Servlet -->
+  <servlet>
+    <servlet-name>ViewDriverServlet</servlet-name>
+    <servlet-class>org.example.servlet.ViewDriversServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ViewDriverServlet</servlet-name>
+    <url-pattern>/ViewDriverServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Update Driver Servlet -->
+  <servlet>
+    <servlet-name>UpdateDriverServlet</servlet-name>
+    <servlet-class>org.example.servlet.UpdateDriverServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>UpdateDriverServlet</servlet-name>
+    <url-pattern>/UpdateDriverServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Delete Driver Servlet -->
+  <servlet>
+    <servlet-name>DeleteDriverServlet</servlet-name>
+    <servlet-class>org.example.servlet.DeleteDriverServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>DeleteDriverServlet</servlet-name>
+    <url-pattern>/DeleteDriverServlet</url-pattern>
+  </servlet-mapping>
+
+  <!-- Welcome file (landing page) -->
+  <welcome-file-list>
+    <welcome-file>index.jsp</welcome-file>
+  </welcome-file-list>
+
+</web-app>
