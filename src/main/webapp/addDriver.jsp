@@ -172,6 +172,18 @@
         </div>
       </div>
 
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" name="email" required>
+      </div>
+      <div class="form-col">
+        <div class="form-group">
+          <label for="phoneNumber">Phone Number</label>
+          <input type="text" id="phoneNumber" name="phoneNumber" required>
+        </div>
+      </div>
+
+
       <div class="form-row">
         <div class="form-col">
           <div class="form-group">
@@ -179,18 +191,9 @@
             <input type="text" id="licenseNumber" name="licenseNumber" required>
           </div>
         </div>
-        <div class="form-col">
-          <div class="form-group">
-            <label for="phoneNumber">Phone Number</label>
-            <input type="text" id="phoneNumber" name="phoneNumber" required>
-          </div>
-        </div>
       </div>
 
-      <div class="form-group">
-        <label for="email">Email Address</label>
-        <input type="email" id="email" name="email" required>
-      </div>
+
 
       <div class="form-actions">
         <a href="index.jsp" class="back-link">Back to Dashboard</a>
