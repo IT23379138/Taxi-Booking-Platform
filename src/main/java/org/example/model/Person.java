@@ -13,7 +13,6 @@ public abstract class Person {
         this.phone = phone;
     }
 
-    public abstract void displayInfo();
 
     // Encapsulation with Getters/Setters
     public String getId() {
@@ -40,6 +39,10 @@ public abstract class Person {
         this.email = email;
     }
 
-    public String getPhone() { return phone; }
-    public void setPhone(String phone) { this.phone = phone; }
+    public String getPhone() {
+        return phone;
+    }
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
 }

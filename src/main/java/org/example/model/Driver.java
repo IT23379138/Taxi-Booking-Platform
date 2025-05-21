@@ -26,18 +26,12 @@ public class Driver extends Person {
         this.rating = rating;
     }
 
-    @Override
-    public void displayInfo() {
-        System.out.println("Driver ID: " + id + ", Name: " + name + ", Rating: " + rating);
-    }
 
     @Override
     public String toString() {
         return id + "," + name + "," + email + "," + phone + "," + licenseNumber + "," + rating;
     }
 
-    // Converts a string representation of a Driver (e.g., from a file) back into a Driver object.
-    //Utility: Used by DriverFileUtil to reconstruct Driver objects when reading from drivers.txt.
     public static Driver fromString(String line) {
         String[] parts = line.split(",");
         return new Driver(parts[0], parts[1], parts[2], parts[3], parts[4], Double.parseDouble(parts[5]));
