@@ -6,9 +6,6 @@
          version="3.1">
 
   <display-name>Taxi and Cab Service Booking Platform</display-name>
-  <listener>
-    <listener-class>org.example.util.AppContextListener</listener-class>
-  </listener>
 
   <!-- Login Servlet -->
   <servlet>
