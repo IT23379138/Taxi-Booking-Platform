@@ -334,10 +334,10 @@
             </tbody>
         </table>
     </div>
-
     <a href="admin_dashboard.jsp" class="back-link">
         <i class="fas fa-arrow-left"></i> Back to Dashboard
     </a>
+
 </div>
 
 <script>
