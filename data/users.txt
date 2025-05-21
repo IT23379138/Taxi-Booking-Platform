@@ -1,0 +1,7 @@
+user1,password123,user1@example.com,user
+admin1,1,admin1@example.com,admin
+new,1,prarthanamaduwantha2003@gmail.com,user
+virul,1,prarthanamaduwantha2003@gmail.com,user
+aaa,1,prarthanamaduwantha2@gmail.com,user
+sinoli,1,prarthanamaduwantha2003@gmail.com,user
+rt,1,prarthanamaduwantha2@gmail.com,user

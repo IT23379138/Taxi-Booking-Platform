@@ -1,2 +1,0 @@
-user1,password123,user1@example.com,user
-admin1,1,admin1@example.com,admin

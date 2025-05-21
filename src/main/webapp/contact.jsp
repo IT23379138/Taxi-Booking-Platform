@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,146 +12,116 @@
     <link href="css/style.css" rel="stylesheet">
     <style>
         .contact-card {
-            border-radius: 16px;
-            overflow: hidden;
-            transition: all 0.3s ease;
+            transition: transform 0.3s ease;
+            cursor: pointer;
         }
         .contact-card:hover {
             transform: translateY(-5px);
         }
         .contact-icon {
-            font-size: 2.5rem;
-            margin-bottom: 1.5rem;
-            color: var(--accent);
+            font-size: 2rem;
+            margin-bottom: 1rem;
         }
-        .contact-method {
-            padding: 2rem;
-            height: 100%;
+        .divider {
             display: flex;
-            flex-direction: column;
             align-items: center;
             text-align: center;
-        }
-        .contact-divider {
-            display: flex;
-            align-items: center;
             margin: 2rem 0;
-            color: var(--text-light);
         }
-        .contact-divider::before,
-        .contact-divider::after {
+        .divider::before,
+        .divider::after {
             content: '';
             flex: 1;
-            border-bottom: 1px solid var(--glass-border);
+            border-bottom: 1px solid #dee2e6;
         }
-        .contact-divider::before {
-            margin-right: 1rem;
-        }
-        .contact-divider::after {
-            margin-left: 1rem;
+        .divider span {
+            padding: 0 1rem;
+            color: #6c757d;
+            font-size: 0.9rem;
         }
     </style>
 </head>
-<body class="fadeIn">
+<body>
 <%@ include file="navbar.jsp" %>
 
-<div class="container">
-    <div class="text-center mb-5">
-        <h2 class="mb-3">
-            <i class="fas fa-headset me-2"></i>We're Here to Help
-        </h2>
-        <p class="lead text-muted">
-            Have questions or need assistance? Reach out to our support team.
-        </p>
-    </div>
-
+<div class="container py-5">
+    <h2 class="text-center mb-5">Contact Us</h2>
+    
     <div class="row g-4 mb-5">
         <div class="col-md-4">
-            <div class="card glass contact-card h-100">
-                <div class="contact-method">
-                    <div class="contact-icon">
-                        <i class="fas fa-envelope"></i>
-                    </div>
-                    <h5 class="mb-3">Email Support</h5>
-                    <p class="text-muted mb-4">
-                        Send us an email and we'll get back to you within 24 hours.
-                    </p>
-                    <button class="btn btn-primary" onclick="sendEmail()">
-                        <i class="fas fa-paper-plane me-2"></i>Email Us
+            <div class="card contact-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-envelope contact-icon text-primary"></i>
+                    <h5 class="card-title">Email Support</h5>
+                    <p class="card-text">Get in touch with our support team via email</p>
+                    <button class="btn btn-primary" onclick="window.location.href='mailto:support@citycabs.com'">
+                        <i class="fas fa-paper-plane me-2"></i>Send Email
                     </button>
                 </div>
             </div>
         </div>
-
+        
         <div class="col-md-4">
-            <div class="card glass contact-card h-100">
-                <div class="contact-method">
-                    <div class="contact-icon">
-                        <i class="fas fa-phone-alt"></i>
-                    </div>
-                    <h5 class="mb-3">Call Us</h5>
-                    <p class="text-muted mb-4">
-                        Speak directly with our support team during business hours.
-                    </p>
-                    <button class="btn btn-primary" onclick="callPhone()">
-                        <i class="fas fa-phone me-2"></i>+1-800-555-1234
+            <div class="card contact-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-phone contact-icon text-success"></i>
+                    <h5 class="card-title">Call Us</h5>
+                    <p class="card-text">Speak directly with our customer service</p>
+                    <button class="btn btn-success" onclick="window.location.href='tel:+1234567890'">
+                        <i class="fas fa-phone me-2"></i>Call Now
                     </button>
                 </div>
             </div>
         </div>
-
+        
         <div class="col-md-4">
-            <div class="card glass contact-card h-100">
-                <div class="contact-method">
-                    <div class="contact-icon">
-                        <i class="fas fa-comment-dots"></i>
-                    </div>
-                    <h5 class="mb-3">Live Chat</h5>
-                    <p class="text-muted mb-4">
-                        Chat with us in real-time for immediate assistance.
-                    </p>
-                    <button class="btn btn-primary" onclick="startChat()">
-                        <i class="fas fa-comment me-2"></i>Start Chat
+            <div class="card contact-card h-100">
+                <div class="card-body text-center">
+                    <i class="fas fa-comments contact-icon text-info"></i>
+                    <h5 class="card-title">Live Chat</h5>
+                    <p class="card-text">Chat with our support team in real-time</p>
+                    <button class="btn btn-info text-white" onclick="alert('Live chat is currently offline. Please try email or phone support.')">
+                        <i class="fas fa-comments me-2"></i>Start Chat
                     </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <div class="contact-divider">
+    <div class="divider">
         <span>OR</span>
     </div>
 
     <div class="row justify-content-center">
-        <div class="col-lg-8">
-            <div class="card glass">
-                <div class="card-body p-4">
-                    <h5 class="mb-4 text-center">
-                        <i class="fas fa-paper-plane me-2"></i>Send Us a Message
-                    </h5>
-                    <form>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="name" class="form-label">Your Name</label>
-                                <input type="text" class="form-control" id="name" required>
-                            </div>
-                            <div class="col-md-6">
-                                <label for="email" class="form-label">Email Address</label>
-                                <input type="email" class="form-control" id="email" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="subject" class="form-label">Subject</label>
-                                <input type="text" class="form-control" id="subject" required>
-                            </div>
-                            <div class="col-12">
-                                <label for="message" class="form-label">Message</label>
-                                <textarea class="form-control" id="message" rows="4" required></textarea>
-                            </div>
-                            <div class="col-12">
-                                <button type="submit" class="btn btn-primary w-100">
-                                    <i class="fas fa-paper-plane me-2"></i>Send Message
-                                </button>
-                            </div>
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-body">
+                    <h4 class="card-title text-center mb-4">Send us a Message</h4>
+                    <form id="contactForm" class="needs-validation" novalidate>
+                        <div class="mb-3">
+                            <label for="name" class="form-label">Name</label>
+                            <input type="text" class="form-control" id="name" required>
+                            <div class="invalid-feedback">Please enter your name.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" required>
+                            <div class="invalid-feedback">Please enter a valid email address.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" required>
+                            <div class="invalid-feedback">Please enter a subject.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="message" class="form-label">Message</label>
+                            <textarea class="form-control" id="message" rows="4" required></textarea>
+                            <div class="invalid-feedback">Please enter your message.</div>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane me-2"></i>Send Message
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -161,24 +132,20 @@
 
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script>
-    function sendEmail() {
-        window.location.href = 'mailto:support@citycabs.com?subject=CityCabs Support Request';
-    }
-
-    function callPhone() {
-        const phoneNumber = '+18005551234';
-        if (/iPhone|iPad|iPod/i.test(navigator.userAgent)) {
-            window.location.href = `tel:${phoneNumber}`;
-        } else {
-            navigator.clipboard.writeText(phoneNumber).then(() => {
-                alert('Phone number copied to clipboard: ' + phoneNumber);
-            });
-        }
-    }
-
-    function startChat() {
-        alert('Our live chat service is currently offline. Please email or call us for assistance.');
-    }
+    // Form validation
+    (function () {
+        'use strict'
+        var forms = document.querySelectorAll('.needs-validation')
+        Array.prototype.slice.call(forms).forEach(function (form) {
+            form.addEventListener('submit', function (event) {
+                if (!form.checkValidity()) {
+                    event.preventDefault()
+                    event.stopPropagation()
+                }
+                form.classList.add('was-validated')
+            }, false)
+        })
+    })()
 </script>
 </body>
 </html>

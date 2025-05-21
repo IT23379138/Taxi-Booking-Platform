@@ -1,4 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <nav class="navbar navbar-expand-lg shadow-sm">
     <div class="container-fluid">
         <a class="navbar-brand" href="index.jsp">
@@ -48,8 +49,8 @@
                 </li>
 
                 <li class="nav-item">
-                    <a class="nav-link" href="feedback?action=logout">
-                        <i class="fas fa-sign-out-alt me-1"></i>Logout
+                    <a class="nav-link" href="userAndDriver?action=logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
                     </a>
                 </li>
 
@@ -65,6 +66,10 @@
                     </a>
                 </li>
                 <% } %>
+
+                <li class="nav-item">
+                    <a class="nav-link" href="contact.jsp">Contact Us</a>
+                </li>
             </ul>
         </div>
     </div>

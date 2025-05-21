@@ -1,5 +1,5 @@
 package org.pg113.citycabsfeedbacksystem;
-
+//IT24100212
 import javax.servlet.ServletContext;
 import java.io.*;
 import java.util.*;
@@ -7,15 +7,16 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Logger;
 
 public class FeedbackService {
-    private static final String USERS_FILE = "/WEB-INF/data/users.txt";
-    private static final String DRIVERS_FILE = "/WEB-INF/data/drivers.txt";
-    private static final String FEEDBACKS_FILE = "/WEB-INF/data/feedbacks.txt";
+    private static final String BASE_PATH = "D:\\qq\\git\\Taxi-Booking-Platform\\data";
+    private static final String FEEDBACKS_FILE = BASE_PATH + "\\feedbacks.txt";
     private final AtomicInteger feedbackIdCounter = new AtomicInteger(1);
     private static final Logger LOGGER = Logger.getLogger(FeedbackService.class.getName());
+    private UserAndDriver userAndDriver;
 
     public FeedbackService() {
         initializeFeedbackIdCounter();
         initializeDefaultFiles();
+        userAndDriver = UserAndDriver.getInstance();
     }
 
     private void initializeFeedbackIdCounter() {
@@ -43,7 +44,7 @@ public class FeedbackService {
         String feedbacksPath = getFilePath(FEEDBACKS_FILE);
         File feedbacksFile = new File(feedbacksPath);
         if (!feedbacksFile.exists()) {
-            try (BufferedWriter writer = new BufferedWriter(new FileWriter(feedbacksPath))) {
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(feedbacksFile))) {
                 writer.write("1,user1,user1@example.com,Great service,5,D001,4,Service,No Response,Pending\n");
                 LOGGER.info("Created default feedbacks.txt with sample data");
             } catch (IOException e) {
@@ -52,84 +53,64 @@ public class FeedbackService {
         }
     }
 
+    private String getFilePath(String filePath) {
+        return filePath;
+    }
+
     public boolean validateUser(String username, String password) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(USERS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 2 && parts[0].equals(username) && parts[1].equals(password)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error validating user: " + e.getMessage());
-        }
-        return false;
+        return userAndDriver.validateUser(username, password);
     }
 
     public boolean userExists(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(USERS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 1 && parts[0].equals(username)) {
-                    return true;
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error checking user existence: " + e.getMessage());
-        }
-        return false;
+        return userAndDriver.userExists(username);
     }
 
     public void addUser(String username, String password, String email, String role) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath(USERS_FILE), true))) {
-            writer.write(username + "," + password + "," + email + "," + role + "\n");
-            LOGGER.info("Added user: " + username);
-        } catch (IOException e) {
-            LOGGER.severe("Error adding user: " + e.getMessage());
-        }
+        userAndDriver.addUser(username, password, email, role);
     }
 
     public String getUserEmail(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(USERS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 3 && parts[0].equals(username)) {
-                    return parts[2];
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error getting user email: " + e.getMessage());
-        }
-        return null;
+        return userAndDriver.getUserEmail(username);
     }
 
     public String getUserRole(String username) {
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(USERS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 4 && parts[0].equals(username)) {
-                    return parts[3];
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error getting user role: " + e.getMessage());
-        }
-        return null;
+        return userAndDriver.getUserRole(username);
     }
 
     public void addFeedback(String name, String email, String message, int rating, String driverId, int driverRating, String category) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath(FEEDBACKS_FILE), true))) {
-            int id = feedbackIdCounter.getAndIncrement();
-            String feedback = id + "," + name + "," + email + "," + message + "," +
-                    rating + "," + driverId + "," + driverRating + "," + category + ",No Response,Pending";
-            writer.write(feedback + "\n");
-            LOGGER.info("Added feedback ID: " + id);
+        try {
+            // Create the data directory if it doesn't exist
+            File dataDir = new File(BASE_PATH);
+            if (!dataDir.exists()) {
+                dataDir.mkdirs();
+            }
+
+            // Create the feedbacks file if it doesn't exist
+            File feedbacksFile = new File(getFilePath(FEEDBACKS_FILE));
+            if (!feedbacksFile.exists()) {
+                feedbacksFile.createNewFile();
+            }
+
+            // Read existing feedbacks to get the next ID
+            List<String[]> existingFeedbacks = getAllFeedbacks();
+            int nextId = 1;
+            if (!existingFeedbacks.isEmpty()) {
+                nextId = existingFeedbacks.stream()
+                    .mapToInt(feedback -> Integer.parseInt(feedback[0]))
+                    .max()
+                    .orElse(0) + 1;
+            }
+
+            // Append the new feedback
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath(FEEDBACKS_FILE), true))) {
+                String feedback = nextId + "," + name + "," + email + "," + message + "," +
+                        rating + "," + driverId + "," + driverRating + "," + category + ",No Response,Pending";
+                writer.write(feedback + "\n");
+                LOGGER.info("Added feedback ID: " + nextId);
+            }
         } catch (IOException e) {
             LOGGER.severe("Error adding feedback: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -147,28 +128,11 @@ public class FeedbackService {
     }
 
     public Map<String, String> getAllDrivers() {
-        Map<String, String> drivers = new LinkedHashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(DRIVERS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",");
-                if (parts.length >= 2) {
-                    drivers.put(parts[0], parts[1]);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error retrieving drivers: " + e.getMessage());
-        }
-        return drivers;
+        return userAndDriver.getAllDrivers();
     }
 
     public void addDriver(String driverId, String driverName) {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath(DRIVERS_FILE), true))) {
-            writer.write(driverId + "," + driverName + "\n");
-            LOGGER.info("Added driver: " + driverName);
-        } catch (IOException e) {
-            LOGGER.severe("Error adding driver: " + e.getMessage());
-        }
+        userAndDriver.addDriver(driverId, driverName);
     }
 
     public void updateFeedbackResponse(String id, String feedbackResponse, String status) {
@@ -184,6 +148,22 @@ public class FeedbackService {
             LOGGER.info("Updated feedback response for ID: " + id);
         } catch (IOException e) {
             LOGGER.severe("Error updating feedback response: " + e.getMessage());
+        }
+    }
+
+    public void updateFeedback(String id, String message, int rating) {
+        List<String[]> feedbacks = getAllFeedbacks();
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(getFilePath(FEEDBACKS_FILE)))) {
+            for (String[] feedback : feedbacks) {
+                if (feedback[0].equals(id)) {
+                    feedback[3] = message;
+                    feedback[4] = String.valueOf(rating);
+                }
+                writer.write(String.join(",", feedback) + "\n");
+            }
+            LOGGER.info("Updated feedback for ID: " + id);
+        } catch (IOException e) {
+            LOGGER.severe("Error updating feedback: " + e.getMessage());
         }
     }
 
@@ -228,63 +208,23 @@ public class FeedbackService {
             double avg = ratings.stream().mapToInt(Integer::intValue).average().orElse(0.0);
             averages.put(driverId + ":" + drivers.getOrDefault(driverId, "Unknown"), Math.round(avg * 100.0) / 100.0);
         }
-
-        return averages.entrySet().stream()
-                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
-                .collect(LinkedHashMap::new, (m, e) -> m.put(e.getKey(), e.getValue()), LinkedHashMap::putAll);
-    }
-
-    public Map<String, Integer> getCategoryDistribution() {
-        Map<String, Integer> distribution = new HashMap<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(FEEDBACKS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 10);
-                if (parts.length >= 8) {
-                    String category = parts[7];
-                    distribution.put(category, distribution.getOrDefault(category, 0) + 1);
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error calculating category distribution: " + e.getMessage());
-        }
-        return distribution;
+        return averages;
     }
 
     public double calculateAverageRating() {
-        List<Integer> ratings = new ArrayList<>();
-        try (BufferedReader reader = new BufferedReader(new FileReader(getFilePath(FEEDBACKS_FILE)))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 10);
-                if (parts.length >= 5) {
-                    ratings.add(Integer.parseInt(parts[4]));
-                }
-            }
-        } catch (IOException e) {
-            LOGGER.severe("Error calculating average rating: " + e.getMessage());
+        List<String[]> feedbacks = getAllFeedbacks();
+        if (feedbacks.isEmpty()) {
+            return 0.0;
         }
-        return ratings.stream().mapToInt(Integer::intValue).average().orElse(0.0);
+        double sum = feedbacks.stream()
+                .mapToDouble(feedback -> Double.parseDouble(feedback[4]))
+                .sum();
+        return Math.round((sum / feedbacks.size()) * 100.0) / 100.0;
     }
 
-    private String getFilePath(String fileName) {
-        ServletContext context = FeedbackServletContextHolder.getServletContext();
-        if (context == null) {
-            LOGGER.severe("ServletContext is null");
-            return "";
-        }
-        String path = context.getRealPath(fileName);
-        File file = new File(path);
-        File parentDir = file.getParentFile();
-        if (!parentDir.exists()) {
-            boolean created = parentDir.mkdirs();
-            if (!created) {
-                LOGGER.severe("Failed to create directory: " + parentDir.getPath());
-            } else {
-                LOGGER.info("Created directory: " + parentDir.getPath());
-            }
-        }
-        return path;
+    public Map<String, Long> getCategoryDistribution() {
+        return getAllFeedbacks().stream()
+                .collect(java.util.stream.Collectors.groupingBy(f -> f[7], java.util.stream.Collectors.counting()));
     }
 
     public static class FeedbackServletContextHolder {

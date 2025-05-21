@@ -8,17 +8,20 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 @WebServlet("/feedback")
 public class FeedbackServlet extends HttpServlet {
     private FeedbackService feedbackService;
+    private UserAndDriver userAndDriver;
     private static final Logger LOGGER = Logger.getLogger(FeedbackServlet.class.getName());
 
     @Override
     public void init() throws ServletException {
         feedbackService = new FeedbackService();
+        userAndDriver = UserAndDriver.getInstance();
         FeedbackService.FeedbackServletContextHolder.setServletContext(getServletContext());
         LOGGER.info("FeedbackServlet initialized");
     }
@@ -27,7 +30,7 @@ public class FeedbackServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(false);
-
+        
         if (action == null) {
             request.getRequestDispatcher("/index.jsp").forward(request, response);
             return;
@@ -36,6 +39,8 @@ public class FeedbackServlet extends HttpServlet {
         switch (action) {
             case "dashboard":
                 if (session != null && session.getAttribute("username") != null) {
+                    List<String[]> feedbacks = feedbackService.getAllFeedbacks();
+                    request.setAttribute("feedbacks", feedbacks);
                     request.setAttribute("averageRating", feedbackService.calculateAverageRating());
                     request.setAttribute("categoryDistribution", feedbackService.getCategoryDistribution());
                     request.setAttribute("driverRatings", feedbackService.calculateDriverRatings());
@@ -47,7 +52,7 @@ public class FeedbackServlet extends HttpServlet {
             case "list":
                 if (session != null && session.getAttribute("username") != null) {
                     request.setAttribute("feedbacks", feedbackService.getAllFeedbacks());
-                    request.setAttribute("drivers", feedbackService.getAllDrivers());
+                    request.setAttribute("drivers", userAndDriver.getAllDrivers());
                     request.setAttribute("isAdmin", "admin".equals(session.getAttribute("userRole")));
                     request.getRequestDispatcher("/list.jsp").forward(request, response);
                 } else {
@@ -66,12 +71,12 @@ public class FeedbackServlet extends HttpServlet {
                 break;
             case "driverDetails":
                 if (session != null && "admin".equals(session.getAttribute("userRole"))) {
-                    String driverId = request.getParameter("driverId"); // Use request parameter directly
+                    String driverId = request.getParameter("driverId");
                     request.setAttribute("driverFeedbacks", feedbackService.getAllFeedbacks().stream()
                             .filter(f -> f[5].equals(driverId))
                             .collect(java.util.stream.Collectors.toList()));
                     request.setAttribute("driverId", driverId);
-                    request.setAttribute("driverName", feedbackService.getAllDrivers().getOrDefault(driverId, "Unknown"));
+                    request.setAttribute("driverName", userAndDriver.getAllDrivers().getOrDefault(driverId, "Unknown"));
                     request.getRequestDispatcher("/driver_details.jsp").forward(request, response);
                 } else {
                     response.sendRedirect("index.jsp");
@@ -97,16 +102,45 @@ public class FeedbackServlet extends HttpServlet {
                     response.sendRedirect("index.jsp");
                 }
                 break;
-            case "logout":
-                if (session != null) {
-                    session.invalidate();
-                }
-                request.getRequestDispatcher("/logout.jsp").forward(request, response);
-                break;
             case "form":
                 if (session != null && session.getAttribute("username") != null) {
-                    request.setAttribute("drivers", feedbackService.getAllDrivers());
+                    request.setAttribute("drivers", userAndDriver.getAllDrivers());
+                    if (session.getAttribute("userEmail") == null) {
+                        session.setAttribute("userEmail", feedbackService.getUserEmail((String)session.getAttribute("username")));
+                    }
                     request.getRequestDispatcher("/form.jsp").forward(request, response);
+                } else {
+                    response.sendRedirect("index.jsp");
+                }
+                break;
+            case "deleteFeedback":
+                if (session != null && session.getAttribute("username") != null) {
+                    String feedbackId = request.getParameter("feedbackId");
+                    feedbackService.deleteFeedback(feedbackId);
+                    response.sendRedirect("feedback?action=list");
+                } else {
+                    response.sendRedirect("index.jsp");
+                }
+                break;
+            case "editFeedback":
+                if (session != null && session.getAttribute("username") != null) {
+                    String feedbackId = request.getParameter("feedbackId");
+                    String message = sanitizeInput(request.getParameter("message"));
+                    String editRatingStr = request.getParameter("rating");
+                    
+                    try {
+                        int rating = Integer.parseInt(editRatingStr);
+                        if (rating < 1 || rating > 5) {
+                            request.setAttribute("error", "Rating must be between 1 and 5");
+                            response.sendRedirect("feedback?action=list");
+                            return;
+                        }
+                        feedbackService.updateFeedback(feedbackId, message, rating);
+                        response.sendRedirect("feedback?action=list");
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("error", "Invalid rating format");
+                        response.sendRedirect("feedback?action=list");
+                    }
                 } else {
                     response.sendRedirect("index.jsp");
                 }
@@ -120,45 +154,19 @@ public class FeedbackServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
         HttpSession session = request.getSession(false);
-
+        
         if (action == null) {
             response.sendRedirect("index.jsp");
             return;
         }
 
         switch (action) {
-            case "login":
-                String username = sanitizeInput(request.getParameter("username"));
-                String password = sanitizeInput(request.getParameter("password"));
-                if (feedbackService.validateUser(username, password)) {
-                    session = request.getSession(true);
-                    session.setAttribute("username", username);
-                    session.setAttribute("userEmail", feedbackService.getUserEmail(username));
-                    session.setAttribute("userRole", feedbackService.getUserRole(username));
-                    response.sendRedirect("feedback?action=dashboard");
-                } else {
-                    request.setAttribute("error", "Invalid credentials");
-                    request.getRequestDispatcher("/index.jsp").forward(request, response);
-                }
-                break;
-            case "signup":
-                String newUsername = sanitizeInput(request.getParameter("username"));
-                String newPassword = sanitizeInput(request.getParameter("password"));
-                String userEmail = sanitizeInput(request.getParameter("email"));
-                if (!feedbackService.userExists(newUsername)) {
-                    feedbackService.addUser(newUsername, newPassword, userEmail, "user");
-                    request.getRequestDispatcher("/signup_success.jsp").forward(request, response);
-                } else {
-                    request.setAttribute("error", "Username already exists");
-                    request.getRequestDispatcher("/index.jsp").forward(request, response);
-                }
-                break;
             case "submitFeedback":
                 String name = sanitizeInput(request.getParameter("name"));
                 String email = sanitizeInput(request.getParameter("email"));
-                String message = sanitizeInput(request.getParameter("message"));
+                String feedbackMessage = sanitizeInput(request.getParameter("message"));
                 String ratingStr = request.getParameter("rating");
-                String driverId = sanitizeInput(request.getParameter("driverId")); // Use parameter directly
+                String driverId = sanitizeInput(request.getParameter("driverId"));
                 String driverRatingStr = request.getParameter("driverRating");
                 String category = sanitizeInput(request.getParameter("category"));
 
@@ -167,15 +175,15 @@ public class FeedbackServlet extends HttpServlet {
                     int driverRating = driverRatingStr != null ? Integer.parseInt(driverRatingStr) : 0;
                     if (rating < 1 || rating > 5 || driverRating < 1 || driverRating > 5) {
                         request.setAttribute("error", "Ratings must be between 1 and 5");
-                        request.setAttribute("drivers", feedbackService.getAllDrivers());
+                        request.setAttribute("drivers", userAndDriver.getAllDrivers());
                         request.getRequestDispatcher("/form.jsp").forward(request, response);
                         return;
                     }
-                    feedbackService.addFeedback(name, email, message, rating, driverId, driverRating, category);
+                    feedbackService.addFeedback(name, email, feedbackMessage, rating, driverId, driverRating, category);
                     request.getRequestDispatcher("/confirmation.jsp").forward(request, response);
                 } catch (NumberFormatException e) {
                     request.setAttribute("error", "Invalid rating format");
-                    request.setAttribute("drivers", feedbackService.getAllDrivers());
+                    request.setAttribute("drivers", userAndDriver.getAllDrivers());
                     request.getRequestDispatcher("/form.jsp").forward(request, response);
                 }
                 break;
@@ -191,7 +199,7 @@ public class FeedbackServlet extends HttpServlet {
                 }
                 break;
             case "deleteFeedback":
-                if (session != null && "admin".equals(session.getAttribute("userRole"))) {
+                if (session != null && session.getAttribute("username") != null) {
                     String feedbackId = request.getParameter("feedbackId");
                     feedbackService.deleteFeedback(feedbackId);
                     response.sendRedirect("feedback?action=list");
@@ -199,17 +207,24 @@ public class FeedbackServlet extends HttpServlet {
                     response.sendRedirect("index.jsp");
                 }
                 break;
-            case "addDriver":
-                if (session != null && "admin".equals(session.getAttribute("userRole"))) {
-                     driverId = sanitizeInput(request.getParameter("driverId")); // Use parameter directly
-                    String driverName = sanitizeInput(request.getParameter("driverName"));
-                    if (!driverId.isEmpty() && !driverName.isEmpty() && !feedbackService.getAllDrivers().containsKey(driverId)) {
-                        feedbackService.addDriver(driverId, driverName);
-                        response.sendRedirect("feedback?action=adminDriverRatings");
-                    } else {
-                        request.setAttribute("error", "Invalid driver ID or name, or driver already exists");
-                        request.setAttribute("driverRatings", feedbackService.calculateDriverRatings());
-                        request.getRequestDispatcher("/admin_welcome.jsp").forward(request, response);
+            case "editFeedback":
+                if (session != null && session.getAttribute("username") != null) {
+                    String feedbackId = request.getParameter("feedbackId");
+                    String message = sanitizeInput(request.getParameter("message"));
+                    String editRatingStr = request.getParameter("rating");
+                    
+                    try {
+                        int rating = Integer.parseInt(editRatingStr);
+                        if (rating < 1 || rating > 5) {
+                            request.setAttribute("error", "Rating must be between 1 and 5");
+                            response.sendRedirect("feedback?action=list");
+                            return;
+                        }
+                        feedbackService.updateFeedback(feedbackId, message, rating);
+                        response.sendRedirect("feedback?action=list");
+                    } catch (NumberFormatException e) {
+                        request.setAttribute("error", "Invalid rating format");
+                        response.sendRedirect("feedback?action=list");
                     }
                 } else {
                     response.sendRedirect("index.jsp");
@@ -223,11 +238,11 @@ public class FeedbackServlet extends HttpServlet {
     private String sanitizeInput(String input) {
         if (input == null) return "";
         String sanitized = input;
-        sanitized = sanitized.replace("&", "&");
-        sanitized = sanitized.replace("<", "<");
-        sanitized = sanitized.replace(">", ">");
-        sanitized = sanitized.replace("\"", "\"");
-        sanitized = sanitized.replace("'", "'");
+        sanitized = sanitized.replace("&", "&amp;");
+        sanitized = sanitized.replace("<", "&lt;");
+        sanitized = sanitized.replace(">", "&gt;");
+        sanitized = sanitized.replace("\"", "&quot;");
+        sanitized = sanitized.replace("'", "&#39;");
         return sanitized;
     }
 }

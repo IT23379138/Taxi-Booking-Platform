@@ -74,7 +74,7 @@
                         </ul>
                         <div class="tab-content" id="authTabContent">
                             <div class="tab-pane fade show active" id="login" role="tabpanel">
-                                <form action="feedback" method="post">
+                                <form action="userAndDriver" method="post">
                                     <input type="hidden" name="action" value="login">
                                     <div class="mb-3">
                                         <label for="loginUsername" class="form-label" style="color: var(--text-color);">Username</label>
@@ -101,9 +101,11 @@
                                             <a href="#" class="small text-decoration-none" style="color: var(--text-color);">Forgot password?</a>
                                         </div>
                                     </div>
-                                    <button type="submit" class="btn btn-primary w-100 scale py-3 animate__animated animate__pulse" style="color: white;">
-                                        <i class="fas fa-sign-in-alt me-2"></i>Login
-                                    </button>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn btn-primary btn-lg rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                            <i class="fas fa-sign-in-alt me-2"></i>Login
+                                        </button>
+                                    </div>
                                     <div class="divider mt-4">or continue with</div>
                                     <div class="d-flex">
                                         <a href="#" class="contact-btn scale w-50 me-1" style="color: var(--text-color);"><i class="fab fa-google"></i> Google</a>
@@ -112,8 +114,9 @@
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="signup" role="tabpanel">
-                                <form action="feedback" method="post">
+                                <form action="userAndDriver" method="post">
                                     <input type="hidden" name="action" value="signup">
+                                    <input type="hidden" name="redirect" value="signup_success.jsp">
                                     <div class="mb-3">
                                         <label for="signupUsername" class="form-label" style="color: var(--text-color);">Username</label>
                                         <div class="input-group">
@@ -148,9 +151,11 @@
                                             I agree to the <a href="#" class="text-decoration-none" style="color: var(--accent);">Terms of Service</a> and <a href="#" class="text-decoration-none" style="color: var(--accent);">Privacy Policy</a>
                                         </label>
                                     </div>
-                                    <button type="submit" class="btn btn-primary w-100 scale py-3 animate__animated animate__pulse" style="color: white;">
-                                        <i class="fas fa-user-plus me-2"></i>Create Account
-                                    </button>
+                                    <div class="d-flex gap-3">
+                                        <button class="btn btn-outline-primary btn-lg rounded-pill px-4" data-bs-toggle="modal" data-bs-target="#signupModal">
+                                            <i class="fas fa-user-plus me-2"></i>Sign Up
+                                        </button>
+                                    </div>
                                     <div class="divider mt-4">or sign up with</div>
                                     <div class="d-flex">
                                         <a href="#" class="contact-btn scale w-50 me-1" style="color: var(--text-color);"><i class="fab fa-google"></i> Google</a>
@@ -187,7 +192,7 @@
                         </ul>
                         <div class="tab-content" id="mobileAuthTabContent">
                             <div class="tab-pane fade show active" id="mobileLogin" role="tabpanel">
-                                <form action="feedback" method="post">
+                                <form action="userAndDriver" method="post">
                                     <input type="hidden" name="action" value="login">
                                     <div class="mb-3">
                                         <label for="mobileLoginUsername" class="form-label" style="color: var(--text-color);">Username</label>
@@ -220,7 +225,7 @@
                                 </form>
                             </div>
                             <div class="tab-pane fade" id="mobileSignup" role="tabpanel">
-                                <form action="feedback" method="post">
+                                <form action="userAndDriver" method="post">
                                     <input type="hidden" name="action" value="signup">
                                     <div class="mb-3">
                                         <label for="mobileSignupUsername" class="form-label" style="color: var(--text-color);">Username</label>

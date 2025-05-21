@@ -136,7 +136,7 @@
                 <h5 class="modal-title" id="addDriverModalLabel">Add New Driver</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-            <form action="feedback" method="post">
+            <form action="userAndDriver" method="post">
                 <div class="modal-body">
                     <input type="hidden" name="action" value="addDriver">
                     <div class="mb-3">
