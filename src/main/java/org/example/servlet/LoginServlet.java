@@ -15,10 +15,10 @@ public class LoginServlet extends HttpServlet {
 
         if (username.equals("admin") && password.equals("admin123")) {
             session.setAttribute("role", "admin");
-            response.sendRedirect("admin_dashboard.jsp"); // Redirect to admin dashboard
+            response.sendRedirect("admin_dashboard.jsp");
         } else if (username.equals("user") && password.equals("user123")) {
             session.setAttribute("role", "user");
-            response.sendRedirect("view-drivers"); // Redirect user to view the driver list
+            response.sendRedirect("user_dashboard.jsp");
         } else {
             request.setAttribute("error", "Invalid credentials");
             request.getRequestDispatcher("login.jsp").forward(request, response);

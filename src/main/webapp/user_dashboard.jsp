@@ -362,7 +362,7 @@
       icon.classList.replace('fa-sun', 'fa-moon');
       localStorage.setItem('theme', 'light');
     }
-  });
+  });//
 </script>
 </body>
 </html>

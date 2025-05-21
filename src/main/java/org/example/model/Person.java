@@ -1,6 +1,6 @@
 package org.example.model;
 
-public abstract class Person {
+public class Person {
     protected String id;
     protected String name;
     protected String email;
