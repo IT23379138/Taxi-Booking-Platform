@@ -16,7 +16,7 @@ public class DriverFileUtil {
             writer.write(driver.toString());
             writer.newLine();
         } catch (IOException e) {
-            e.printStackTrace();
+            e.printStackTrace();//FileNotFoundException
         }
     }
 
@@ -73,15 +73,23 @@ public class DriverFileUtil {
     // Sort drivers by rating using bubble sort (descending)
     public static List<Driver> getAllDriversSortedByRating() {
         List<Driver> drivers = getAllDrivers();
+        boolean swapped;
+
         for (int i = 0; i < drivers.size() - 1; i++) {
+            swapped = false;
             for (int j = 0; j < drivers.size() - i - 1; j++) {
                 if (drivers.get(j).getRating() < drivers.get(j + 1).getRating()) {
                     Driver temp = drivers.get(j);
                     drivers.set(j, drivers.get(j + 1));
                     drivers.set(j + 1, temp);
+                    swapped = true;
                 }
+            }
+            if (!swapped) {
+                break;
             }
         }
         return drivers;
     }
+
 }
